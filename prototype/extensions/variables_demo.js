@@ -124,7 +124,7 @@ function seedDemoGraph() {
       g.add(n);
       return n;
     };
-    mk("Variable", [40, 120], { name: "color name", value: "muted plum" });
+    mk("Variable", [40, 120], { name: "mood", value: "somber" });
     mk("Variable", [40, 360], { name: "color name", value: "burnt sienna" });
     mk("Variable", [40, 600], { name: "style", value: "[era] film stock" });
     const str = mk("PrimitiveStringMultiline", [430, 120], {
