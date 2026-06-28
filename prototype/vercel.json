@@ -1,0 +1,62 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/api/object_info",
+      "destination": "/api/object_info.json"
+    },
+    {
+      "source": "/api/users",
+      "destination": "/api/users.json"
+    },
+    {
+      "source": "/api/system_stats",
+      "destination": "/api/system_stats.json"
+    },
+    {
+      "source": "/api/settings",
+      "destination": "/api/settings.json"
+    },
+    {
+      "source": "/api/i18n",
+      "destination": "/api/i18n.json"
+    },
+    {
+      "source": "/api/extensions",
+      "destination": "/api/extensions.json"
+    },
+    {
+      "source": "/api/jobs",
+      "destination": "/api/jobs.json"
+    },
+    {
+      "source": "/api/node_replacements",
+      "destination": "/api/node_replacements.json"
+    },
+    {
+      "source": "/api/experiment/models",
+      "destination": "/api/experiment_models.json"
+    },
+    {
+      "source": "/api/experiment/models/vae",
+      "destination": "/api/experiment_models_vae.json"
+    },
+    {
+      "source": "/api/global_subgraphs",
+      "destination": "/api/global_subgraphs.json"
+    },
+    {
+      "source": "/api/global_subgraphs/(.*)",
+      "destination": "/api/global_subgraphs.json"
+    },
+    {
+      "source": "/internal/folder_paths",
+      "destination": "/internal/folder_paths.json"
+    },
+    {
+      "source": "/((?!api/|assets/|extensions/|scripts/|fonts/|cursor/|internal/|materialdesignicons|user\\.css|favicon).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
