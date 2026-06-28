@@ -142,15 +142,6 @@ function seedDemoGraph() {
   }
 }
 
-function banner() {
-  const b = document.createElement("div");
-  b.innerHTML =
-    'Prompt Variables — <b>static prototype</b> of the real ComfyUI UI. Press <b>Run</b> to resolve <code>[tokens]</code> (resolve runs client-side here).';
-  b.style.cssText =
-    "position:fixed;left:50%;transform:translateX(-50%);top:8px;z-index:9000;background:rgba(42,48,56,.95);border:1px solid #444c57;border-radius:999px;padding:6px 16px;font:12px/1.4 ui-sans-serif,system-ui,sans-serif;color:#cdd3db;box-shadow:0 6px 20px rgba(0,0,0,.35)";
-  document.body.appendChild(b);
-}
-
 /* ---------- inline per-variable color highlighting in text widgets ---------- */
 const PALETTE = ["#6fcf7f", "#5b8cff", "#e0a64b", "#cf6fd0", "#4fd0c0", "#e0726f", "#b6d05b", "#9b8cff", "#f08fb4", "#5bd0e0"];
 
@@ -276,14 +267,11 @@ function populatePreviews() {
 
 function suppressDefaultGraphToast() {
   // The seeded demo replaces ComfyUI's default graph, whose missing-model
-  // validation can fire a stray toast. Remove just that one for a clean demo.
-  let n = 0;
-  const iv = setInterval(() => {
-    document.querySelectorAll('.p-toast-message,[class*="toast"]').forEach((el) => {
-      if (/required models are missing|missing models/i.test(el.textContent || "")) el.remove();
-    });
-    if (++n > 60) clearInterval(iv);
-  }, 300);
+  // validation fires a stray error toast. This static demo has no real toasts
+  // to show, so hide the toast layer outright for a clean presentation.
+  const style = document.createElement("style");
+  style.textContent = ".p-toast{display:none !important}";
+  document.head.appendChild(style);
 }
 
 app.registerExtension({
@@ -299,7 +287,6 @@ app.registerExtension({
       if (!hasVariableNodes()) seedDemoGraph();
       if (hasVariableNodes() || tries > 8) { clearInterval(iv); setTimeout(populatePreviews, 400); }
     }, 500);
-    setTimeout(banner, 900);
     // Intercept the real Run/Queue button: resolve client-side instead of POSTing.
     if (typeof app.queuePrompt === "function") {
       const orig = app.queuePrompt.bind(app);
