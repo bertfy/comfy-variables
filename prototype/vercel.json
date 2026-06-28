@@ -58,5 +58,34 @@
       "source": "/((?!api/|assets/|extensions/|scripts/|fonts/|cursor/|internal/|materialdesignicons|user\\.css|favicon).*)",
       "destination": "/index.html"
     }
+  ],
+  "headers": [
+    {
+      "source": "/extensions/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, max-age=0, must-revalidate"
+        }
+      ]
+    }
   ]
 }
