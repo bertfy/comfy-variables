@@ -143,7 +143,8 @@ function seedDemoGraph() {
 }
 
 /* ---------- inline per-variable color highlighting in text widgets ---------- */
-const PALETTE = ["#6fcf7f", "#5b8cff", "#e0a64b", "#cf6fd0", "#4fd0c0", "#e0726f", "#b6d05b", "#9b8cff", "#f08fb4", "#5bd0e0"];
+// solid fills — deep enough that the light field text stays readable on top
+const PALETTE = ["#3f9d63", "#4a6fd6", "#c2872f", "#a052ad", "#2f9aa3", "#c2564f", "#6f9a2f", "#7a63d6", "#c25f8a", "#2f8fa3"];
 
 function registryColorMap(reg) {
   const m = new Map();
@@ -160,9 +161,9 @@ function highlightHTML(text, reg, cmap) {
     const name = m[0].slice(1, -1);
     if (reg.has(name)) {
       const c = cmap.get(name);
-      html += `<span style="border-radius:3px;background:${c}3d;box-shadow:inset 0 -2px 0 ${c}">${esc(m[0])}</span>`;
+      html += `<span style="border-radius:3px;background:${c}">${esc(m[0])}</span>`; // solid fill
     } else {
-      html += `<span style="border-radius:3px;background:#ffffff14;box-shadow:inset 0 -2px 0 #8a8a8a">${esc(m[0])}</span>`;
+      html += `<span style="border-radius:3px;background:#ffffff14">${esc(m[0])}</span>`; // faint, undefined
     }
     last = re.lastIndex;
   }
@@ -216,6 +217,7 @@ function startHighlighting() {
     const reg = buildRegistry(app.graph);
     const cmap = registryColorMap(reg);
     document.querySelectorAll("textarea.comfy-multiline-input").forEach((ta) => {
+      if (ta.readOnly) return; // don't highlight read-only display fields (Preview as Text)
       try {
         syncHighlight(ta, reg, cmap);
         if (!ta._pvBound) {
@@ -267,11 +269,20 @@ function populatePreviews() {
 
 function suppressDefaultGraphToast() {
   // The seeded demo replaces ComfyUI's default graph, whose missing-model
-  // validation fires a stray error toast. This static demo has no real toasts
-  // to show, so hide the toast layer outright for a clean presentation.
+  // validation fires a stray "required models are missing" panel at varying
+  // times. Remove that panel whenever it appears (robust to class names).
   const style = document.createElement("style");
   style.textContent = ".p-toast{display:none !important}";
   document.head.appendChild(style);
+  // Safely dismiss the "required models are missing" panel by clicking its own
+  // Dismiss button (no DOM removal, so nothing else can break).
+  let n = 0;
+  const iv = setInterval(() => {
+    document.querySelectorAll("button").forEach((b) => {
+      if ((b.textContent || "").trim().toLowerCase() === "dismiss") b.click();
+    });
+    if (++n > 80) clearInterval(iv);
+  }, 250);
 }
 
 app.registerExtension({
