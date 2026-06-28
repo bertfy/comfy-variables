@@ -185,6 +185,10 @@ function ensureBackdrop(ta) {
   if (getComputedStyle(parent).position === "static") parent.style.position = "relative";
   let bd = ta._pvBackdrop;
   if (!bd || !bd.isConnected) {
+    // capture the field's real background BEFORE we make the textarea transparent,
+    // so the backdrop can re-paint it and the field keeps its proper color.
+    const obg = getComputedStyle(ta).backgroundColor;
+    ta._pvOrigBg = obg && obg !== "rgba(0, 0, 0, 0)" && obg !== "transparent" ? obg : "";
     bd = document.createElement("div");
     bd.className = "pv-hl-backdrop";
     bd.appendChild(document.createElement("div")); // marks layer
@@ -204,7 +208,8 @@ function syncHighlight(ta, reg, cmap) {
   bd.style.cssText =
     `position:absolute;left:${ta.offsetLeft}px;top:${ta.offsetTop}px;` +
     `width:${ta.offsetWidth}px;height:${ta.offsetHeight}px;overflow:hidden;` +
-    `pointer-events:none;z-index:0;border-radius:${cs.borderRadius}`;
+    `pointer-events:none;z-index:0;border-radius:${cs.borderRadius};` +
+    `background:${ta._pvOrigBg || "transparent"}`;
   const marks = bd.firstChild;
   marks.style.cssText =
     `font:${cs.font};letter-spacing:${cs.letterSpacing};padding:${cs.padding};` +
@@ -277,7 +282,7 @@ function suppressDefaultGraphToast() {
     document.querySelectorAll('.p-toast-message,[class*="toast"]').forEach((el) => {
       if (/required models are missing|missing models/i.test(el.textContent || "")) el.remove();
     });
-    if (++n > 20) clearInterval(iv);
+    if (++n > 60) clearInterval(iv);
   }, 300);
 }
 
