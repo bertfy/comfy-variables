@@ -229,7 +229,9 @@ function startHighlighting() {
     if (!app.graph) return;
     const reg = buildRegistry(app.graph);
     const cmap = registryColorMap(reg);
-    document.querySelectorAll("textarea.comfy-multiline-input").forEach((ta) => {
+    // works in both legacy litegraph (textarea.comfy-multiline-input) and
+    // Nodes 2.0 / Vue Nodes (textarea.flex...) — select all multiline textareas
+    document.querySelectorAll("textarea").forEach((ta) => {
       if (ta.readOnly) return; // don't highlight read-only display fields (Preview as Text)
       try {
         syncHighlight(ta, reg, cmap);
