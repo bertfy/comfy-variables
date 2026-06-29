@@ -22,11 +22,23 @@ function buildRegistry(graph) {
 }
 
 function resolveOnce(text, reg) {
-  // single pass over original [tokens]; inserted text not re-scanned
+  // single pass over [tokens]
   return String(text).replace(/\[[^\[\]]*\]/g, (m) => {
     const name = m.slice(1, -1);
     return reg.has(name) ? reg.get(name) : m; // missing -> literal
   });
+}
+
+function resolveNested(text, reg) {
+  // resolve repeatedly so an inserted value's own [tokens] also resolve
+  // (e.g. [style] -> "[era] film stock" -> "1980s film stock"); capped for cycles
+  let out = String(text);
+  for (let i = 0; i < 12; i++) {
+    const next = resolveOnce(out, reg);
+    if (next === out) break;
+    out = next;
+  }
+  return out;
 }
 
 function resolveGraph(graph) {
@@ -124,9 +136,10 @@ function seedDemoGraph() {
       g.add(n);
       return n;
     };
-    mk("Variable", [40, 120], { name: "mood", value: "somber" });
-    mk("Variable", [40, 360], { name: "color name", value: "burnt sienna" });
+    mk("Variable", [40, 120], { name: "color name", value: "muted plum" });
+    mk("Variable", [40, 360], { name: "mood", value: "somber" });
     mk("Variable", [40, 600], { name: "style", value: "[era] film stock" });
+    mk("Variable", [40, 840], { name: "era", value: "1980s" });
     const str = mk("PrimitiveStringMultiline", [430, 120], {
       value: "a lone figure in a [color name] coat, [mood] tone, shot on [style]",
     });
@@ -244,7 +257,7 @@ function resolvedOutputOf(node, reg) {
          || (node.widgets || []).find((w) => typeof w.value === "string");
   if (!w) return "";
   const raw = String(w.value == null ? "" : w.value);
-  return node.type === "Variable" ? raw : resolveOnce(raw, reg); // Variable outputs raw
+  return node.type === "Variable" ? raw : resolveNested(raw, reg); // Variable outputs raw
 }
 
 function populatePreviews() {
